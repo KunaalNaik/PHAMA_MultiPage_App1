@@ -3,7 +3,7 @@ import pandas as pd
 # import time
 
 # Packages for Data Extract
-import sqlalchemy as db
+# import sqlalchemy as db
 import psycopg2
 # import xlsxwriter
 
@@ -21,7 +21,16 @@ st.set_page_config(layout="wide")
 # st.write(st.session_state)
 
 # Load SQL Engine
-engine = db.create_engine("postgresql://devikasrinivas:Data1281@aact-db.ctti-clinicaltrials.org:5432/aact")
+# For better connection use this
+# https://docs.streamlit.io/knowledge-base/tutorials/databases/postgresql
+
+
+@st.experimental_singleton
+def init_connection():
+    return psycopg2.connect(**st.secrets["postgres"])
+
+
+# engine = db.create_engine("postgresql://devikasrinivas:Data1281@aact-db.ctti-clinicaltrials.org:5432/aact")
 
 # Get Tables and Column Names to Extract
 view1_columns = pd.read_csv('input/view1_columns.csv')

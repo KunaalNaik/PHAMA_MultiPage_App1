@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
-import time
+# import time
 
 # Packages for Data Extract
 import sqlalchemy as db
-import xlsxwriter
+# import xlsxwriter
 
 # Packages for Download
 from io import BytesIO
@@ -13,38 +13,11 @@ from io import BytesIO
 # Page Configuration
 st.set_page_config(layout="wide")
 
+# Initialize State
+# if "load_state" not in st.session_state:
+#    st.session_state.load_state = False
 
-# sample_check = st.checkbox("Check this to get Sample Data")
-def get_input_nct_ids(list_nct_id):
-    list_nct_id = input_nct_ids.nct_id.to_list()
-    nct_string = "('" + "', '".join([str(elem) for elem in list_nct_id]) + "')"
-    return nct_string
-
-
-# Step 1 : Connect and Download raw Data from CTTI Database
-# Use this space to upload NCT Ids
-st.markdown("# 1/ Upload NCT Ids")
-
-# Option 1 - User Upload
-uploaded_nct_ids = st.file_uploader('Please ensure the table contains only one column with "nct_id" as column')
-# if uploaded_nct_ids is not None:
-#   input_nct_ids = uploaded_nct_ids.nct_id.to_list()
-#    st.warning(get_input_nct_ids(input_nct_ids))
-
-
-# Option 2 - While developement
-# sample Data Upload and Stored in Cache
-@st.cache
-def data_upload():
-    df = pd.read_csv('input/input_nct_ids.csv')
-    return df
-
-
-input_nct_ids = data_upload()
-st.warning(get_input_nct_ids(input_nct_ids.nct_id.to_list()))
-
-
-# Download Excel file with all Data
+# st.write(st.session_state)
 
 # Load SQL Engine
 engine = db.create_engine("postgresql://devikasrinivas:Data1281@aact-db.ctti-clinicaltrials.org:5432/aact")
@@ -55,6 +28,18 @@ view_1_table_names = view1_columns['table_name'].unique().tolist()
 
 
 # Functions
+def reset_button():
+    st.session_state["download_check1"] = False
+    st.session_state["download_check2"] = False
+    return
+
+
+def get_input_nct_ids(list_nct_id):
+    list_nct_id = input_nct_ids.nct_id.to_list()
+    nct_string = "('" + "', '".join([str(elem) for elem in list_nct_id]) + "')"
+    return nct_string
+
+
 def get_ctti_table(table_name):
     # takes the table name and the required NCt Ids that the use provide
     # Returns the Filtered tables
@@ -86,14 +71,59 @@ def export_ctti_tables():
     return buffer
 
 
-st.markdown("# 2/ Download Raw Data from Clinical Trials Database")
+def download_button_xlsx():
+    st.markdown("# 2/ Download Raw Data from Clinical Trials Database")
+    with st.spinner("Please wait ... "):
+        export_buffer = export_ctti_tables()
+        st.download_button(
+            label="Download Excel workbook",
+            data=export_buffer,
+            file_name="output/selected_CTTI_tables.xlsx",
+            mime="application/vnd.ms-excel",
+            on_click=reset_button
+        )
+
+# App Start
 
 
-with st.spinner("Please wait ... "):
-    export_buffer = export_ctti_tables()
-    st.download_button(
-        label="Download Excel workbook",
-        data=export_buffer,
-        file_name="output/selected_CTTI_tables.xlsx",
-        mime="application/vnd.ms-excel"
-    )
+st.markdown("# 0/ Own Project or Sample Project")
+sample_project_checked = st.checkbox("use Sample Project")
+
+
+if sample_project_checked:
+    # Use Sample Data for testing Purpose
+    @st.cache
+    def data_upload():
+        df = pd.read_csv('input/input_nct_ids.csv')
+        return df
+
+    input_nct_ids = data_upload()
+
+    st.markdown("# 1/ Already Uploaded Sample Data")
+    st.warning(get_input_nct_ids(input_nct_ids.nct_id.to_list()))
+
+    begin_checked = st.checkbox("Click to Start Download Process", key='download_check1')
+
+    if begin_checked:
+        download_button_xlsx()
+
+else:
+    # Use this space to upload NCT Ids and get User Generated Output
+    st.markdown("# 1/ Upload NCT Ids")
+
+    # Take User Upload
+    uploaded_raw_nct_ids = st.file_uploader('Please ensure the table contains only one column with "nct_id" as column')
+
+    if uploaded_raw_nct_ids is not None:
+        df_nct_ids = pd.read_csv(uploaded_raw_nct_ids, header=0)
+        # st.write(df_nct_ids)
+        input_nct_ids = df_nct_ids
+        st.warning(get_input_nct_ids(input_nct_ids))
+
+        begin_checked = st.checkbox("Click to Start Download Process", key='download_check2')
+
+        if begin_checked:
+            download_button_xlsx()
+
+    else:
+        st.warning("No NCT Ids Uploaded")

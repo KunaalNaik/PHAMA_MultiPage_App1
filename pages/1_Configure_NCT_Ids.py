@@ -5,10 +5,10 @@ import pandas as pd
 # Packages for Data Extract
 # import sqlalchemy as db
 import psycopg2
-import xlsxwriter
+# import xlsxwriter
 
 # Packages for Download
-from io import BytesIO
+import io
 
 
 # Page Configuration
@@ -78,7 +78,7 @@ def get_ctti_table(table_name):
 
 
 def export_ctti_tables():
-    buffer = BytesIO()
+    buffer = io.BytesIO()
     # this works - https://discuss.streamlit.io/t/how-to-add-a-download-excel-csv-function-to-a-button/4474/16
     writer = pd.ExcelWriter(buffer, engine='xlsxwriter')
     # writer = pd.ExcelWriter('output/selected_CTTI_tables.xlsx', engine='xlsxwriter')

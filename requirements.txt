@@ -2,4 +2,3 @@ streamlit==1.16.0
 pandas==1.5.2
 sqlalchemy==1.4.45
 psycopg2-binary==2.9.3
-xlsxwriter==3.0.0

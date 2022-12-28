@@ -30,6 +30,7 @@ def init_connection():
     return psycopg2.connect(**st.secrets["postgres"])
 
 
+connection = init_connection()
 # engine = db.create_engine("postgresql://devikasrinivas:Data1281@aact-db.ctti-clinicaltrials.org:5432/aact")
 
 # Get Tables and Column Names to Extract
@@ -42,6 +43,15 @@ def reset_button():
     st.session_state["download_check1"] = False
     st.session_state["download_check2"] = False
     return
+
+
+def fetch_results(sql, conn):
+    cur = conn.cursor()
+    cur.execute(sql)
+    columns = [desc[0] for desc in cur.description]
+    df = pd.DataFrame(cur.fetchall(), columns=columns)
+    cur.close()
+    return df
 
 
 def get_input_nct_ids(list_nct_id):
@@ -61,7 +71,8 @@ def get_ctti_table(table_name):
 
     query_string = 'SELECT ' + ctti_cols_string + ' from ' + table_name + ' where nct_id in ' + nct_ids_string
 
-    ctti_table = pd.read_sql(query_string, engine)
+    # ctti_table = pd.read_sql(query_string, engine)
+    ctti_table = fetch_results(sql=query_string, conn=connection)
 
     return ctti_table
 

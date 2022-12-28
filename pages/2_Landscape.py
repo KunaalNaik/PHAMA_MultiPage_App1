@@ -4,9 +4,11 @@ import psycopg2
 
 st.set_page_config(layout="wide")
 
+
 @st.experimental_singleton
 def init_connection():
     return psycopg2.connect(**st.secrets["postgres"])
+
 
 def fetch_results(sql, conn):
     cur = conn.cursor()
@@ -17,9 +19,9 @@ def fetch_results(sql, conn):
     return df
 
 
-conn = init_connection()
+connection = init_connection()
 
 
-sql = "select * from countries limit 5"
-df = fetch_results(sql=sql, conn=conn)
-st.write(df.head)
+sql_query_string = "select * from countries limit 5"
+ctti_df = fetch_results(sql=sql_query_string, conn=connection)
+st.write(ctti_df.head())

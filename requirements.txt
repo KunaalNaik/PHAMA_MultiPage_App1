@@ -3,3 +3,4 @@ pandas==1.5.2
 sqlalchemy==1.4.45
 psycopg2-binary==2.9.3
 xlsxwriter
+streamlit-aggrid

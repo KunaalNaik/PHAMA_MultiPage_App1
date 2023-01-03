@@ -5,12 +5,15 @@ import io
 from st_aggrid import AgGrid
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 
+import plotly
+pd.options.plotting.backend = "plotly"
+
 st.set_page_config(layout="wide")
 
 
 # @st.cache
 def data_upload():
-    df = pd.read_csv('input/views/view_geography.csv')
+    df = pd.read_csv('views/view_geography.csv')
     return df
 
 
@@ -51,6 +54,13 @@ def download_button_xlsx(df):
         )
 
 
+def plot_region_country_count():
+    df = data
+    df_region = pd.DataFrame(df.drop(['c_mature', 'c_non_mature'], axis=1).filter(regex="c_.*").sum()).reset_index()
+    df_region.columns = ['Region', 'Country_Count']
+    return df_region.plot.bar(x='Region', y='Country_Count')
+
+
 data = data_upload()
 
 
@@ -58,5 +68,7 @@ st.header("Geography")
 
 
 download_button_xlsx(data)
+
+st.plotly_chart(plot_region_country_count())
 
 display_table(data)

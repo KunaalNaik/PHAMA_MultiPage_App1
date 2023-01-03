@@ -31,10 +31,9 @@ def init_connection():
 
 
 connection = init_connection()
-# engine = db.create_engine("postgresql://devikasrinivas:Data1281@aact-db.ctti-clinicaltrials.org:5432/aact")
 
 # Get Tables and Column Names to Extract
-view1_columns = pd.read_csv('input/view1_columns.csv')
+view1_columns = pd.read_csv('input/view6_columns.csv')
 view_1_table_names = view1_columns['table_name'].unique().tolist()
 
 
@@ -86,7 +85,7 @@ def export_ctti_tables():
     for tbl_name in view_1_table_names:
         sel_table = get_ctti_table(table_name=tbl_name)
         sel_table.to_excel(writer, sheet_name=tbl_name, index=False)
-        # sel_table.to_csv('output/csv/' + tbl_name + '.csv', index=False)
+        sel_table.to_csv('output/csv/' + tbl_name + '.csv', index=False)
 
     writer.save()
     return buffer

@@ -1,0 +1,15 @@
+table_name,column_name
+studies,nct_id
+studies,start_date
+studies,completion_date
+studies,primary_completion_date
+studies,phase
+studies,enrollment
+browse_interventions,nct_id
+browse_interventions,mesh_term
+conditions,nct_id
+conditions,name
+design_outcomes,nct_id
+design_outcomes,measure
+sponsors,nct_id
+sponsors,name
